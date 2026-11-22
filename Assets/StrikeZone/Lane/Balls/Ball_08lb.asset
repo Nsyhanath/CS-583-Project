@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dabc1dae95f704184b50ab6d0469417d, type: 3}
+  m_Name: Ball_08lb
+  m_EditorClassIdentifier: Assembly-CSharp::StrikeZone.BallSpec
+  displayName: 8 lb
+  massKg: 3.6
+  speedRange: {x: 7, y: 9}
+  control: 1.25
+  hookStrength: 1
+  material: {fileID: 2100000, guid: dd3fd7341e0f2467ea910a7d9df84f9b, type: 2}

@@ -1107,7 +1107,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 65867667415f04d50ace3b4156945e47, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StrikeZone.MenuButton
-  sceneToLoad: 
+  sceneToLoad: BowlingAlley
   message: Lanes are being oiled... gameplay coming soon!
   marker: {fileID: 1722241275}
   selectedScale: 1.06
