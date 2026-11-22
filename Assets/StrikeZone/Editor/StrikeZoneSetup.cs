@@ -32,6 +32,12 @@ namespace StrikeZone.EditorTools
         [MenuItem("Strike Zone/Build Title Screen Scene")]
         public static void BuildMenu()
         {
+            if (File.Exists(ScenePath) && !EditorUtility.DisplayDialog("Strike Zone",
+                    "TitleScreen.unity already exists. Rebuild it from scratch?\n\n" +
+                    "Every change made in that scene is lost, and the whole file changes in git.",
+                    "Rebuild", "Cancel"))
+                return;
+
             if (!File.Exists(TmpSettingsPath))
             {
                 if (!EditorUtility.DisplayDialog("Strike Zone",
@@ -170,14 +176,15 @@ namespace StrikeZone.EditorTools
             layout.childForceExpandWidth = true;
             layout.childForceExpandHeight = false;
 
-            var items = new (string label, string message)[]
+            // sceneToLoad lives here too, so rebuilding the title screen keeps PLAY pointed at the alley.
+            var items = new (string label, string message, string sceneToLoad)[]
             {
-                ("PLAY", "Lanes are being oiled... gameplay coming soon!"),
-                ("HOW TO PLAY", "Aim, spin, and knock 'em all down. (Coming soon)"),
-                ("SETTINGS", "Settings coming soon."),
-                ("HIGH SCORES", "No high scores yet. Be the first!"),
+                ("PLAY", "Lanes are being oiled... gameplay coming soon!", BowlingAlleySetup.SceneName),
+                ("HOW TO PLAY", "Aim, spin, and knock 'em all down. (Coming soon)", ""),
+                ("SETTINGS", "Settings coming soon.", ""),
+                ("HIGH SCORES", "No high scores yet. Be the first!", ""),
             };
-            var buttons = items.Select(i => MakeButton(menuRt, i.label, i.message, pill, ballSprite, font)).ToArray();
+            var buttons = items.Select(i => MakeButton(menuRt, i.label, i.message, i.sceneToLoad, pill, ballSprite, font)).ToArray();
 
             // Footer hint
             var footer = Img("Controls Hint", root, pill, new Color32(12, 6, 20, 180));
@@ -220,7 +227,7 @@ namespace StrikeZone.EditorTools
 
         // ---------- UI helpers ----------
 
-        static MenuButton MakeButton(Transform parent, string label, string message, Sprite pill, Sprite ballSprite, TMP_FontAsset font)
+        static MenuButton MakeButton(Transform parent, string label, string message, string sceneToLoad, Sprite pill, Sprite ballSprite, TMP_FontAsset font)
         {
             var rt = UI(label, parent);
             var img = rt.gameObject.AddComponent<Image>();
@@ -258,6 +265,7 @@ namespace StrikeZone.EditorTools
 
             var mb = rt.gameObject.AddComponent<MenuButton>();
             mb.message = message;
+            mb.sceneToLoad = sceneToLoad;
             mb.marker = marker.gameObject;
             return mb;
         }
