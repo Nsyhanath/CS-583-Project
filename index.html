@@ -1,0 +1,723 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Strike Zone</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bungee&family=Bungee+Shade&family=Outfit:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a0f24;
+    --cream: #fff6e6;
+    --orange: #ff7a1a;
+    --pink: #ff3d8b;
+    --purple: #7b2ff2;
+    --yellow: #ffd23b;
+  }
+  html, body {
+    margin: 0;
+    height: 100%;
+    overflow: hidden;
+    background: #0b0710;
+    font-family: "Outfit", system-ui, sans-serif;
+    color: var(--cream);
+    user-select: none;
+  }
+  canvas#bg {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+  .ui {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0 16px;
+    padding-top: 14vh;
+    box-sizing: border-box;
+    background: radial-gradient(ellipse 60% 42% at 50% 56%, rgba(10,4,18,.62), rgba(10,4,18,0) 70%);
+  }
+  .kicker {
+    font-family: "Outfit", sans-serif;
+    font-weight: 700;
+    letter-spacing: .5em;
+    text-transform: uppercase;
+    font-size: clamp(11px, 1.4vw, 16px);
+    color: var(--yellow);
+    text-shadow: 0 2px 8px rgba(0,0,0,.8);
+    margin-bottom: .6em;
+    padding-left: .5em;
+  }
+  h1 {
+    margin: 0;
+    line-height: .9;
+    text-align: center;
+    font-family: "Bungee", sans-serif;
+    font-weight: 400;
+    font-size: clamp(54px, 11vw, 160px);
+    letter-spacing: .02em;
+    background: linear-gradient(180deg, #fff3b0 0%, #ffd23b 30%, #ff7a1a 58%, #ff3d8b 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    filter: drop-shadow(0 4px 0 #3a0f4f) drop-shadow(0 8px 0 #1a0626) drop-shadow(0 18px 28px rgba(0,0,0,.7));
+    animation: bob 3.2s ease-in-out infinite;
+  }
+  h1 .line2 {
+    display: block;
+    font-family: "Bungee Shade", "Bungee", sans-serif;
+    font-size: .78em;
+    background: linear-gradient(180deg, #e8d9ff 0%, #a86bff 45%, #6a2be0 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+  }
+  @keyframes bob {
+    0%, 100% { transform: translateY(0) rotate(-1.5deg); }
+    50% { transform: translateY(-8px) rotate(-1.5deg); }
+  }
+  .press {
+    margin-top: 4.5vh;
+    font-family: "Bungee", sans-serif;
+    font-size: clamp(14px, 2vw, 22px);
+    letter-spacing: .12em;
+    color: var(--cream);
+    text-shadow: 0 0 12px rgba(255,122,26,.9), 0 2px 4px #000;
+    animation: blink 1.2s steps(2, start) infinite;
+  }
+  @keyframes blink { to { visibility: hidden; } }
+  .menu {
+    margin-top: 3vh;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: stretch;
+    width: min(320px, 100%);
+  }
+  .menu button {
+    font: inherit;
+    font-family: "Bungee", sans-serif;
+    font-size: clamp(15px, 1.7vw, 19px);
+    letter-spacing: .08em;
+    color: var(--cream);
+    background: linear-gradient(180deg, rgba(60,22,90,.85), rgba(26,10,40,.9));
+    border: 2px solid rgba(255,210,59,.35);
+    border-radius: 999px;
+    padding: 12px 22px;
+    cursor: pointer;
+    position: relative;
+    transition: transform .12s ease, border-color .12s ease, box-shadow .12s ease;
+    box-shadow: 0 4px 0 #12061c, 0 10px 20px rgba(0,0,0,.45);
+  }
+  .menu button::before {
+    content: "";
+    position: absolute;
+    left: 16px; top: 50%;
+    width: 14px; height: 14px;
+    margin-top: -7px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #8c93a3, #16181f 70%);
+    opacity: 0;
+    transition: opacity .12s ease;
+  }
+  .menu button.active,
+  .menu button:hover,
+  .menu button:focus-visible {
+    outline: none;
+    transform: translateY(-2px) scale(1.03);
+    border-color: var(--yellow);
+    background: linear-gradient(180deg, #ff8a2a, #ff3d8b);
+    box-shadow: 0 4px 0 #6b1240, 0 0 24px rgba(255,61,139,.55), 0 12px 24px rgba(0,0,0,.5);
+  }
+  .menu button.active::before,
+  .menu button:hover::before,
+  .menu button:focus-visible::before { opacity: 1; }
+  .footer {
+    position: fixed;
+    bottom: 14px; left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    background: rgba(12,6,20,.7);
+    padding: 6px 14px;
+    border-radius: 999px;
+    text-align: center;
+    font-size: 12px;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    color: rgba(255,246,230,.8);
+    text-shadow: 0 1px 3px #000;
+  }
+  .toast {
+    position: fixed;
+    left: 50%; bottom: 48px;
+    transform: translate(-50%, 20px);
+    background: rgba(20,8,32,.92);
+    border: 2px solid var(--yellow);
+    border-radius: 12px;
+    padding: 10px 18px;
+    font-weight: 700;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .25s ease, transform .25s ease;
+    max-width: calc(100% - 32px);
+    text-align: center;
+    box-sizing: border-box;
+  }
+  .toast.show { opacity: 1; transform: translate(-50%, 0); }
+  @media (max-height: 560px) {
+    .ui { padding-top: 10vh; }
+    .press { display: none; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    h1, .press { animation: none; }
+  }
+</style>
+</head>
+<body>
+<canvas id="bg"></canvas>
+
+<div class="ui">
+  <div class="kicker">Ten-Pin Bowling</div>
+  <h1>Strike<span class="line2">Zone</span></h1>
+  <div class="press">Press Enter to Start</div>
+  <nav class="menu" id="menu">
+    <button data-msg="Lanes are being oiled… gameplay coming soon!">Play</button>
+    <button data-msg="Aim, spin, and knock 'em all down. (Coming soon)">How to Play</button>
+    <button data-msg="Settings coming soon.">Settings</button>
+    <button data-msg="No high scores yet. Be the first!">High Scores</button>
+  </nav>
+</div>
+<div class="footer">↑ ↓ to choose · Enter to select</div>
+<div class="toast" id="toast"></div>
+
+<script>
+(() => {
+  const canvas = document.getElementById('bg');
+  const ctx = canvas.getContext('2d');
+  const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  let W, H, dpr, staticCanvas, geo;
+
+  // ---------- helpers ----------
+  function rng(seed) {
+    let s = seed % 2147483647;
+    if (s <= 0) s += 2147483646;
+    return () => (s = (s * 16807) % 2147483647, (s - 1) / 2147483646);
+  }
+  const PAL = ['#ff7a1a', '#ffb000', '#ffd93b', '#ff4f8b', '#c43fd6', '#7b3ff2', '#2f7cff', '#21c4a0', '#7ed957', '#ff5a36', '#ff9ec7'];
+
+  // Perspective: t = 1 at the bottom of the screen, shrinking toward the vanishing point.
+  const tOfZ = z => 1 / (1 + z);
+  const yOfT = t => geo.vpY + t * (H - geo.vpY);
+  const xOf = (worldX, t) => geo.cx + worldX * t;
+
+  // ---------- stained-glass mural ----------
+  function buildMural(w, h) {
+    const m = document.createElement('canvas');
+    m.width = Math.ceil(w * dpr);
+    m.height = Math.ceil(h * dpr);
+    const g = m.getContext('2d');
+    g.scale(dpr, dpr);
+    const r = rng(1337);
+
+    const base = g.createLinearGradient(0, 0, w, 0);
+    PAL.forEach((c, i) => base.addColorStop(i / (PAL.length - 1), c));
+    g.fillStyle = base;
+    g.fillRect(0, 0, w, h);
+
+    const lead = '#2a1338';
+    g.lineJoin = 'round';
+
+    // Overlapping petals / blobs
+    for (let i = 0; i < 90; i++) {
+      const x = r() * w, y = r() * h;
+      const rx = 20 + r() * h * 0.9, ry = 15 + r() * h * 0.6;
+      g.beginPath();
+      g.ellipse(x, y, rx, ry, r() * Math.PI, 0, Math.PI * 2);
+      g.fillStyle = PAL[(r() * PAL.length) | 0];
+      g.globalAlpha = 0.85;
+      g.fill();
+      g.globalAlpha = 1;
+      g.strokeStyle = lead;
+      g.lineWidth = 3;
+      g.stroke();
+    }
+
+    // Swirls
+    for (let i = 0; i < 28; i++) {
+      const x0 = r() * w, y0 = r() * h;
+      g.beginPath();
+      g.moveTo(x0, y0);
+      g.bezierCurveTo(x0 + (r() - .5) * 300, y0 + (r() - .5) * 200,
+                      x0 + (r() - .5) * 300, y0 + (r() - .5) * 200,
+                      x0 + (r() - .5) * 260, y0 + (r() - .5) * 160);
+      g.strokeStyle = PAL[(r() * PAL.length) | 0];
+      g.lineWidth = 9;
+      g.stroke();
+      g.strokeStyle = lead;
+      g.lineWidth = 2.5;
+      g.stroke();
+    }
+
+    // Big "eye" circles with dotted rings, spaced along the wall
+    const step = Math.max(220, w / 4);
+    for (let x = step * 0.5; x < w + step; x += step) {
+      const cx = x + (r() - .5) * 60, cy = h * (0.5 + (r() - .5) * 0.3);
+      const R = h * (0.3 + r() * 0.1);
+      [['#ffd93b', 1], ['#7ed957', 0.86], ['#2f7cff', 0.72], ['#1d4fd6', 0.5]].forEach(([c, k]) => {
+        g.beginPath();
+        g.arc(cx, cy, R * k, 0, Math.PI * 2);
+        g.fillStyle = c;
+        g.fill();
+        g.strokeStyle = lead;
+        g.lineWidth = 3;
+        g.stroke();
+      });
+      g.fillStyle = '#ffd93b';
+      for (let a = 0; a < 7; a++) {
+        const ang = -Math.PI * 0.15 + a * 0.32;
+        g.beginPath();
+        g.arc(cx + Math.cos(ang) * R * 0.6, cy + Math.sin(ang) * R * 0.6, R * 0.045, 0, Math.PI * 2);
+        g.fill();
+      }
+    }
+
+    // Glass sheen
+    const sheen = g.createLinearGradient(0, 0, 0, h);
+    sheen.addColorStop(0, 'rgba(255,255,255,.18)');
+    sheen.addColorStop(0.5, 'rgba(255,255,255,0)');
+    sheen.addColorStop(1, 'rgba(0,0,0,.25)');
+    g.fillStyle = sheen;
+    g.fillRect(0, 0, w, h);
+    return m;
+  }
+
+  // ---------- bowling pin ----------
+  function pinPath(g, x, yb, h) {
+    const w = h * 0.38;
+    g.beginPath();
+    g.moveTo(x - w * 0.24, yb);
+    g.bezierCurveTo(x - w * 0.62, yb - h * 0.2, x - w * 0.55, yb - h * 0.48, x - w * 0.2, yb - h * 0.66);
+    g.bezierCurveTo(x - w * 0.12, yb - h * 0.72, x - w * 0.34, yb - h * 0.84, x - w * 0.24, yb - h * 0.94);
+    g.quadraticCurveTo(x, yb - h * 1.04, x + w * 0.24, yb - h * 0.94);
+    g.bezierCurveTo(x + w * 0.34, yb - h * 0.84, x + w * 0.12, yb - h * 0.72, x + w * 0.2, yb - h * 0.66);
+    g.bezierCurveTo(x + w * 0.55, yb - h * 0.48, x + w * 0.62, yb - h * 0.2, x + w * 0.24, yb);
+    g.closePath();
+  }
+  function drawPin(g, x, yb, h) {
+    const w = h * 0.38;
+    g.save();
+    pinPath(g, x, yb, h);
+    const body = g.createLinearGradient(x - w * 0.6, 0, x + w * 0.6, 0);
+    body.addColorStop(0, '#9ea3b0');
+    body.addColorStop(0.35, '#ffffff');
+    body.addColorStop(0.6, '#f1f2f6');
+    body.addColorStop(1, '#8a8f9c');
+    g.fillStyle = body;
+    g.fill();
+    g.clip();
+    g.fillStyle = '#d4202f';
+    g.fillRect(x - w, yb - h * 0.75, w * 2, h * 0.035);
+    g.fillRect(x - w, yb - h * 0.70, w * 2, h * 0.035);
+    g.restore();
+  }
+  function drawPinRack(g, laneCx, deckY, laneW) {
+    const s = laneW * 0.19;
+    const h = laneW * 0.42;
+    const rows = [[-1.5, -0.5, 0.5, 1.5], [-1, 0, 1], [-0.5, 0.5], [0]];
+    rows.forEach((row, ri) => {
+      const scale = 0.9 + ri * 0.035;
+      const yb = deckY - laneW * (0.075 - ri * 0.022);
+      row.forEach(o => drawPin(g, laneCx + o * s * scale, yb, h * scale));
+    });
+  }
+
+  // ---------- static scene ----------
+  function buildStatic() {
+    const muralH = H * 0.2;
+    const stripB = H * 0.235;
+    const deckY = H * 0.335;
+    const vpY = H * 0.215;
+    const Wb = Math.max(W * 1.05, H * 0.9);
+    const G = Wb * 0.17;   // gutter width
+    const C = Wb * 0.12;   // capping between lanes
+    const P = Wb + 2 * G + C;
+    geo = { muralH, stripB, deckY, vpY, Wb, G, C, P, cx: W / 2 };
+    geo.tDeck = (deckY - vpY) / (H - vpY);
+    geo.zDeck = 1 / geo.tDeck - 1;
+
+    const sc = document.createElement('canvas');
+    sc.width = Math.ceil(W * dpr);
+    sc.height = Math.ceil(H * dpr);
+    const g = sc.getContext('2d');
+    g.scale(dpr, dpr);
+
+    const lanes = [];
+    for (let i = -5; i <= 5; i++) lanes.push(i);
+    const tD = geo.tDeck;
+    const laneWDeck = Wb * tD;
+
+    // Mural
+    const mural = buildMural(W, muralH);
+    g.drawImage(mural, 0, 0, W, muralH);
+
+    // Purple number strip
+    const strip = g.createLinearGradient(0, muralH, 0, stripB);
+    strip.addColorStop(0, '#7a2fb8');
+    strip.addColorStop(1, '#4a1675');
+    g.fillStyle = strip;
+    g.fillRect(0, muralH, W, stripB - muralH);
+    g.fillStyle = 'rgba(255,255,255,.25)';
+    g.fillRect(0, muralH, W, 1.5);
+
+    const numSize = Math.max(11, (stripB - muralH) * 0.6);
+    g.font = `700 ${numSize}px Outfit, system-ui, sans-serif`;
+    g.textBaseline = 'middle';
+    lanes.forEach(i => {
+      const n = i + 5;
+      if (n < 1) return;
+      const xl = xOf(i * P - Wb / 2 - G - C / 2, tD);
+      g.fillStyle = '#fff';
+      g.textAlign = 'center';
+      g.fillText(String(n), xl + laneWDeck * 0.08, (muralH + stripB) / 2);
+      // little indicator lights
+      g.fillStyle = '#ff6a3d';
+      for (let k = 0; k < 2; k++) {
+        g.beginPath();
+        g.arc(xl + laneWDeck * (0.85 + k * 0.06), (muralH + stripB) / 2, numSize * 0.14, 0, Math.PI * 2);
+        g.fill();
+      }
+    });
+
+    // Pit / pin deck area
+    const pit = g.createLinearGradient(0, stripB, 0, deckY);
+    pit.addColorStop(0, '#05040a');
+    pit.addColorStop(1, '#120e1c');
+    g.fillStyle = pit;
+    g.fillRect(0, stripB, W, deckY - stripB);
+
+    lanes.forEach(i => {
+      const xl = xOf(i * P - Wb / 2, tD), xr = xOf(i * P + Wb / 2, tD);
+      const glow = g.createLinearGradient(0, stripB, 0, deckY);
+      glow.addColorStop(0, '#0a1424');
+      glow.addColorStop(1, '#1d2c44');
+      g.fillStyle = glow;
+      g.fillRect(xl, stripB + (deckY - stripB) * 0.12, xr - xl, (deckY - stripB) * 0.88);
+      // dividers between pit openings
+      g.fillStyle = '#1a1520';
+      g.fillRect(xr, stripB, xOf(i * P + Wb / 2 + 2 * G + C, tD) - xr, deckY - stripB);
+      g.fillStyle = 'rgba(160,110,40,.35)';
+      g.fillRect(xr + 2, stripB + (deckY - stripB) * 0.2, Math.max(2, laneWDeck * 0.04), (deckY - stripB) * 0.7);
+    });
+
+    lanes.forEach(i => drawPinRack(g, xOf(i * P, tD), deckY, laneWDeck));
+
+    // ---------- lanes ----------
+    const trap = (x0, x1) => {
+      g.beginPath();
+      g.moveTo(xOf(x0, tD), deckY);
+      g.lineTo(xOf(x1, tD), deckY);
+      g.lineTo(xOf(x1, 1), H);
+      g.lineTo(xOf(x0, 1), H);
+      g.closePath();
+    };
+
+    const woodR = rng(42);
+    const BOARDS = 39;
+    lanes.forEach(i => {
+      const L = i * P - Wb / 2;
+      for (let b = 0; b < BOARDS; b++) {
+        const x0 = L + (b / BOARDS) * Wb, x1 = L + ((b + 1) / BOARDS) * Wb;
+        trap(x0, x1 + 0.5);
+        const j = (woodR() - 0.5) * 18;
+        const grad = g.createLinearGradient(0, deckY, 0, H);
+        grad.addColorStop(0, `rgb(${196 + j},${150 + j},${96 + j})`);
+        grad.addColorStop(0.5, `rgb(${222 + j},${178 + j},${122 + j})`);
+        grad.addColorStop(1, `rgb(${236 + j},${204 + j},${158 + j})`);
+        g.fillStyle = grad;
+        g.fill();
+      }
+      // board seams
+      g.strokeStyle = 'rgba(110,70,30,.18)';
+      g.lineWidth = 1;
+      for (let b = 1; b < BOARDS; b++) {
+        const x = L + (b / BOARDS) * Wb;
+        g.beginPath();
+        g.moveTo(xOf(x, tD), deckY);
+        g.lineTo(xOf(x, 1), H);
+        g.stroke();
+      }
+      // target arrows
+      const arrowZ = 1.6;
+      [-3, -2, -1, 0, 1, 2, 3].forEach(k => {
+        const z = arrowZ + Math.abs(k) * 0.08;
+        const t = tOfZ(z), t2 = tOfZ(z + 0.25);
+        const x = i * P + k * (Wb / 8);
+        const hw = Wb * 0.012;
+        g.beginPath();
+        g.moveTo(xOf(x, t2), yOfT(t2));
+        g.lineTo(xOf(x + hw, t), yOfT(t));
+        g.lineTo(xOf(x - hw, t), yOfT(t));
+        g.closePath();
+        g.fillStyle = 'rgba(70,40,20,.55)';
+        g.fill();
+      });
+    });
+
+    // Clip to lane surfaces for reflections + gloss
+    g.save();
+    g.beginPath();
+    lanes.forEach(i => {
+      const L = i * P - Wb / 2, R = i * P + Wb / 2;
+      g.moveTo(xOf(L, tD), deckY);
+      g.lineTo(xOf(R, tD), deckY);
+      g.lineTo(xOf(R, 1), H);
+      g.lineTo(xOf(L, 1), H);
+      g.closePath();
+    });
+    g.clip();
+
+    // Mural reflection (flipped, blurred, fading)
+    const reflH = (H - deckY) * 0.75;
+    const refl = document.createElement('canvas');
+    refl.width = Math.ceil(W * dpr);
+    refl.height = Math.ceil(reflH * dpr);
+    const rg = refl.getContext('2d');
+    rg.scale(dpr, dpr);
+    rg.filter = 'blur(6px)';
+    rg.save();
+    rg.translate(0, reflH);
+    rg.scale(1, -1);
+    rg.drawImage(mural, -W * 0.15, reflH * 0.25, W * 1.3, reflH * 0.75);
+    rg.restore();
+    rg.filter = 'none';
+    rg.globalCompositeOperation = 'destination-in';
+    const fade = rg.createLinearGradient(0, 0, 0, reflH);
+    fade.addColorStop(0, 'rgba(0,0,0,.15)');
+    fade.addColorStop(0.08, 'rgba(0,0,0,.75)');
+    fade.addColorStop(0.55, 'rgba(0,0,0,.45)');
+    fade.addColorStop(1, 'rgba(0,0,0,0)');
+    rg.fillStyle = fade;
+    rg.fillRect(0, 0, W, reflH);
+    g.globalAlpha = 0.85;
+    g.drawImage(refl, 0, deckY, W, reflH);
+    g.globalAlpha = 1;
+
+    // Pin reflections
+    g.save();
+    g.globalAlpha = 0.28;
+    g.translate(0, deckY * 2);
+    g.scale(1, -1);
+    lanes.forEach(i => drawPinRack(g, xOf(i * P, tD), deckY, laneWDeck));
+    g.restore();
+
+    // Gloss sheen
+    const gloss = g.createLinearGradient(0, deckY, 0, H);
+    gloss.addColorStop(0, 'rgba(255,255,255,.18)');
+    gloss.addColorStop(0.3, 'rgba(255,255,255,.04)');
+    gloss.addColorStop(0.6, 'rgba(255,240,220,.10)');
+    gloss.addColorStop(1, 'rgba(255,255,255,0)');
+    g.fillStyle = gloss;
+    g.fillRect(0, deckY, W, H - deckY);
+    g.restore();
+
+    // ---------- gutters + cappings ----------
+    lanes.forEach(i => {
+      const R = i * P + Wb / 2;
+      // right gutter
+      trap(R, R + G);
+      const gg = g.createLinearGradient(0, deckY, 0, H);
+      gg.addColorStop(0, '#2b2a33');
+      gg.addColorStop(1, '#6b6a78');
+      g.fillStyle = gg;
+      g.fill();
+      // gutter inner shading line
+      g.strokeStyle = 'rgba(0,0,0,.35)';
+      g.lineWidth = 2;
+      g.beginPath();
+      g.moveTo(xOf(R + G * 0.5, tD), deckY);
+      g.lineTo(xOf(R + G * 0.5, 1), H);
+      g.stroke();
+      // left gutter of next lane
+      trap(R + G + C, R + 2 * G + C);
+      g.fillStyle = gg;
+      g.fill();
+      // capping
+      trap(R + G, R + G + C);
+      const cg = g.createLinearGradient(0, deckY, 0, H);
+      cg.addColorStop(0, '#3a3046');
+      cg.addColorStop(1, '#6e5f80');
+      g.fillStyle = cg;
+      g.fill();
+      // shiny edges
+      g.strokeStyle = 'rgba(255,255,255,.55)';
+      g.lineWidth = 1.5;
+      [R + G, R + G + C].forEach(x => {
+        g.beginPath();
+        g.moveTo(xOf(x, tD), deckY);
+        g.lineTo(xOf(x, 1), H);
+        g.stroke();
+      });
+      // colorful reflection on capping
+      g.save();
+      trap(R + G, R + G + C);
+      g.clip();
+      g.globalAlpha = 0.35;
+      g.drawImage(refl, 0, deckY, W, reflH);
+      g.restore();
+      // posts along gutters
+      for (let z = 0.15; z < geo.zDeck; z += 0.45 + z * 0.12) {
+        const t = tOfZ(z);
+        const y = yOfT(t);
+        [R + G * 0.9, R + G + C + G * 0.1].forEach(px => {
+          const pw = Wb * 0.025 * t, ph = Wb * 0.07 * t;
+          g.fillStyle = '#121016';
+          g.fillRect(xOf(px, t) - pw / 2, y - ph, pw, ph);
+          g.fillStyle = 'rgba(255,255,255,.15)';
+          g.fillRect(xOf(px, t) - pw / 2, y - ph, pw * 0.3, ph);
+        });
+      }
+    });
+
+    // Vignette
+    const vg = g.createRadialGradient(W / 2, H * 0.55, Math.min(W, H) * 0.25, W / 2, H * 0.55, Math.max(W, H) * 0.8);
+    vg.addColorStop(0, 'rgba(0,0,0,0)');
+    vg.addColorStop(1, 'rgba(0,0,0,.6)');
+    g.fillStyle = vg;
+    g.fillRect(0, 0, W, H);
+
+    staticCanvas = sc;
+  }
+
+  // ---------- rolling ball ----------
+  const ROLL = 3.4, PAUSE = 0.9;
+  function drawBall(g, x, y, r, phase, alpha) {
+    g.save();
+    g.globalAlpha = alpha;
+    const bg = g.createRadialGradient(x - r * 0.35, y - r * 0.4, r * 0.08, x, y, r);
+    bg.addColorStop(0, '#9aa1b2');
+    bg.addColorStop(0.25, '#3a3f4c');
+    bg.addColorStop(1, '#0b0c10');
+    g.beginPath();
+    g.arc(x, y, r, 0, Math.PI * 2);
+    g.fillStyle = bg;
+    g.fill();
+    // finger holes rolling over the top
+    g.save();
+    g.clip();
+    [[0, 0], [0.45, -0.18], [0.45, 0.18]].forEach(([dp, dx]) => {
+      const a = phase + dp;
+      const c = Math.cos(a);
+      if (c <= 0.05) return;
+      const hy = y - Math.sin(a) * r * 0.75;
+      g.beginPath();
+      g.ellipse(x + dx * r, hy, r * 0.09, r * 0.09 * c, 0, 0, Math.PI * 2);
+      g.fillStyle = 'rgba(0,0,0,.85)';
+      g.fill();
+    });
+    g.restore();
+    // specular
+    g.beginPath();
+    g.ellipse(x - r * 0.35, y - r * 0.45, r * 0.22, r * 0.12, -0.6, 0, Math.PI * 2);
+    g.fillStyle = 'rgba(255,255,255,.55)';
+    g.fill();
+    g.restore();
+  }
+
+  function frame(ms) {
+    const s = ms / 1000;
+    ctx.drawImage(staticCanvas, 0, 0, W, H);
+
+    const cycle = ROLL + PAUSE;
+    const p = reduceMotion ? 0.45 : (s % cycle) / ROLL;
+    if (p <= 1) {
+      const zStart = 0.35, zEnd = geo.zDeck - 0.15;
+      const z = zStart + p * (zEnd - zStart);
+      const t = tOfZ(z);
+      const R = geo.Wb * 0.1;
+      const r = R * t;
+      const worldX = geo.Wb * (0.22 * Math.pow(1 - p, 1.4) + 0.04 * p);
+      const x = xOf(worldX, t);
+      const ySurf = yOfT(t);
+      const y = ySurf - r;
+      const alpha = p > 0.9 ? Math.max(0, (1 - p) / 0.1) : Math.min(1, p / 0.05);
+      const phase = -z * 9;
+
+      // reflection
+      ctx.save();
+      ctx.translate(0, ySurf * 2);
+      ctx.scale(1, -1);
+      drawBall(ctx, x, y, r, phase, alpha * 0.3);
+      ctx.restore();
+      // contact shadow
+      ctx.save();
+      ctx.globalAlpha = alpha * 0.45;
+      ctx.beginPath();
+      ctx.ellipse(x, ySurf, r * 0.85, r * 0.12, 0, 0, Math.PI * 2);
+      ctx.fillStyle = '#000';
+      ctx.fill();
+      ctx.restore();
+      drawBall(ctx, x, y, r, phase, alpha);
+    }
+    if (!reduceMotion) requestAnimationFrame(frame);
+  }
+
+  function resize() {
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    W = window.innerWidth;
+    H = window.innerHeight;
+    if (W < 2 || H < 2) { setTimeout(resize, 100); return false; }
+    canvas.width = Math.ceil(W * dpr);
+    canvas.height = Math.ceil(H * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    buildStatic();
+    if (reduceMotion) frame(0);
+    if (!running && !reduceMotion) { running = true; requestAnimationFrame(frame); }
+    return true;
+  }
+  let running = false;
+
+  let resizeTimer;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(resize, 120);
+  });
+
+  // Draw right away, then redraw once web fonts arrive (lane numbers use them).
+  resize();
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { if (W > 1) resize(); });
+
+  // ---------- menu ----------
+  const buttons = [...document.querySelectorAll('#menu button')];
+  const toast = document.getElementById('toast');
+  let sel = 0, toastTimer;
+  const setSel = i => {
+    sel = (i + buttons.length) % buttons.length;
+    buttons.forEach((b, k) => b.classList.toggle('active', k === sel));
+  };
+  const choose = b => {
+    toast.textContent = b.dataset.msg;
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.classList.remove('show'), 2200);
+  };
+  buttons.forEach((b, i) => {
+    b.addEventListener('mouseenter', () => setSel(i));
+    b.addEventListener('click', () => choose(b));
+  });
+  window.addEventListener('keydown', e => {
+    if (e.key === 'ArrowDown') { setSel(sel + 1); e.preventDefault(); }
+    else if (e.key === 'ArrowUp') { setSel(sel - 1); e.preventDefault(); }
+    else if (e.key === 'Enter' && document.activeElement?.tagName !== 'BUTTON') choose(buttons[sel]);
+  });
+  setSel(0);
+})();
+</script>
+</body>
+</html>

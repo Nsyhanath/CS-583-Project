@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 846ded5969c4f43e8a20605b9dea868b, type: 3}
+  m_Name: LaneConfig
+  m_EditorClassIdentifier: Assembly-CSharp::StrikeZone.LaneConfig
+  laneWidth: 1.0668
+  boardCount: 39
+  headPinZ: 18.288
+  pitEdgeZ: 19.156
+  gutterWidth: 0.235
+  pinSpacing: 0.3048
+  rowSpacing: 0.26397
+  ballRadius: 0.109
+  ballStartZ: -0.3
+  startBoard: 10
+  breakpointZ: 11
+  hookAccel: 0.6
+  steerLimitZ: 12.2
+  steerAccel: 0.8
+  downTiltDegrees: 20
+  pinSettleLinear: 0.02
+  pinSettleAngular: 0.1
+  pinSettleSeconds: 0.75
+  ballStopSpeed: 0.05
+  ballStopSeconds: 0.5
+  timeoutAfterContact: 4
+  timeoutAfterRelease: 8
