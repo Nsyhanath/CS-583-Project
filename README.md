@@ -16,7 +16,7 @@ Strike Zone is a game that puts a twist on bowling. Although there exists bowlin
 ---
 
 **Demo Video**
-[▶ Watch the demo video](Videos/StrikeZone-Demo.mp4)
+[▶ Watch the demo video](Videos/DemoVid.mp4)
 
 ---
 
@@ -24,6 +24,7 @@ Strike Zone is a game that puts a twist on bowling. Although there exists bowlin
 * Add a line that correlates to where the ball will be released from the foul line up to the target arrows.
 * Create a power/hook meter that shows the bowler how much the ball will spin, the speed at which it will go, and how much tilt the ball will have.
 * Adding a visual graphic that shows what pins remain, so the bowler knows how to adjust their positioning and ball motion.
+* Add a scoreboard that shows the current and previous frame.
     * *Optional Goals:*
         * Add obstacles that bowlers can dodge.
         * Add oil patterns that actually gets worn down as you throw the ball (Bowling Balls can pick up/move the oil to the side, which causes dry spots and drags oil down to areas that doesn't have oil).
