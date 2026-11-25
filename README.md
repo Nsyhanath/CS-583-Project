@@ -16,7 +16,9 @@ Strike Zone is a game that puts a twist on bowling. Although there exists bowlin
 ---
 
 **Demo Video**
-<video src="./Videos/DemoVid.mp4" controls width="100%"></video>
+[![Watch the Strike Zone demo on YouTube](https://img.youtube.com/vi/Stta99YPXJc/hqdefault.jpg)](https://youtu.be/Stta99YPXJc)
+
+▶ **[Watch the demo video on YouTube](https://youtu.be/Stta99YPXJc)**
 
 ---
 
